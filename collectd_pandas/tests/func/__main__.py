@@ -12,7 +12,6 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
-import os.path
 import sys
 
 from collectd_pandas.tests.func.main import main

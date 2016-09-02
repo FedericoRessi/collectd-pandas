@@ -28,7 +28,7 @@ LOGGER = logging.getLogger(__name__)
 @run_in_collectd
 def main(argv):
     try:
-        argv = ('unittest2',) +  tuple(argv[1:])
+        argv = ('unittest2',) + tuple(argv[1:])
         LOGGER.debug('Run tests inside collectd:\n\t' + str(argv))
         unittest2.main(
             module=None,
@@ -97,10 +97,10 @@ class LogTestResult(unittest2.TestResult):
         error_details = self.separator2 + "\n"
         for _test, err in errors:
             assert _test is test
-            error_details += "ERROR: " +  _test.id() + "\n" + str(err)
+            error_details += "ERROR: " + _test.id() + "\n" + str(err)
         for _test, err in failures:
             assert _test is test
-            error_details += "FAIL: " +  _test.id() + "\n" + str(err)
+            error_details += "FAIL: " + _test.id() + "\n" + str(err)
         error_details += self.separator2 + "\n"
 
         if failures:

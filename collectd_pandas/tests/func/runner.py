@@ -128,7 +128,9 @@ class CollectdRunner(object):
             return runner
 
 
-run_in_collectd = CollectdRunner.run_in_collectd  # pylint: disable=invalid-name
+# pylint: disable=invalid-name
+run_in_collectd = CollectdRunner.run_in_collectd
+# pylint: enable=invalid-name
 
 
 @contextmanager
