@@ -12,10 +12,17 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
-from collectd_pandas.tests.func.base import FunctionalTestCase
+
+from unittest2 import TestCase
 
 
-class TestPlugin(FunctionalTestCase):
+import collectd  # pylint: disable=import-error
 
-    def test_register_callbacks(self):
+
+class TestPlugin(TestCase):
+
+    @staticmethod
+    def test_register_callbacks():
         "test register_callbaks method"
+
+        collectd.info("test something with collectd.")

@@ -12,11 +12,18 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
-import unittest
+import os.path
+import sys
+
+from collectd_pandas.tests.func.main import main
 
 
-class FunctionalTestCase(unittest.TestCase):
+ARGV = tuple(sys.argv)
+if len(ARGV) < 2:
+    ARGV = (
+        'unittest2', 'discover', '--locals', '--pattern', 'test_*.py',
+        '--top-level-directory', '.',
+        '--start-directory',
+        './collectd_pandas/tests/func')
 
-    @classmethod
-    def setUpClass(cls):
-        super(FunctionalTestCase, cls).setUpClass()
+sys.exit(main(argv=ARGV))
