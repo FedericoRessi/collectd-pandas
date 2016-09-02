@@ -1,5 +1,6 @@
 CHANGES
 =======
 
+* Provision a Vagrant file to be used for functional testing
 * Create tox.ini and setup.py
 * Initial commit

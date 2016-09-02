@@ -1,15 +1,33 @@
 - hosts: all
   remote_user: ubuntu
   tasks:
+
   - name: ensure collectd is installed
     become: true
     become_user: root
     apt:
       name: collectd
       state: present
-  - name: ensure collectd is not stopped
+
+  - name: ensure collectd is stopped
     become: true
     become_user: root
     service:
       name: collectd
       state: stopped
+
+  - name: ensure pip is installed
+    become: true
+    become_user: root
+    easy_install:
+      name: pip
+      state: latest
+
+  - name: ensure setuptools, pip and tox are installed at the lates version
+    become: true
+    become_user: root
+    action: pip name={{item}} state=latest
+    with_items:
+      setuptools
+      pip
+      tox

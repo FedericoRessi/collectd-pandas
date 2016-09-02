@@ -12,11 +12,10 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
-import unittest
+from collectd_pandas.tests.func.base import FunctionalTestCase
 
 
-class FunctionalTestCase(unittest.TestCase):
+class TestPlugin(FunctionalTestCase):
 
-    @classmethod
-    def setUpClass(cls):
-        super(FunctionalTestCase, cls).setUpClass()
+    def test_register_callbacks(self):
+        "test register_callbaks method"

@@ -69,7 +69,9 @@ Vagrant.configure(2) do |config|
   # the path on the host to the actual folder. The second argument is
   # the path on the guest to mount the folder. And the optional third
   # argument is a set of non-required options.
-  config.vm.synced_folder ".", source_dir, create:true, type: sync_type
+  config.vm.synced_folder ".", source_dir,\
+    create:true, type: sync_type,
+    rsync__exclude: ".tox"
 
   # Provider-specific configuration so you can fine-tune various
   # backing providers for Vagrant. These expose provider-specific options.
@@ -110,22 +112,24 @@ Vagrant.configure(2) do |config|
   end
 
   config.vm.provision "shell", privileged: false, inline: <<-SHELL
-     set -xe
-     echo "Start provisioning."
-     set -ex
-     export DEBIAN_FRONTEND="noninteractive"
 
-     echo "Update and install required packages."
-     # echo | sudo add-apt-repository cloud-archive:mitaka || true
-     sudo apt-get update
-     sudo apt-get upgrade -y
-     sudo apt-get install -y python-minimal python-setuptools
+    echo "Start provisioning."
+    set -ex
+    export DEBIAN_FRONTEND="noninteractive"
+
+    if ! python --version; then
+      echo "Update and install python required by ansible."
+      sudo apt-get update
+      sudo apt-get upgrade -y
+      sudo apt-get install -y python-minimal python-setuptools
+    fi
+
+    # echo | sudo add-apt-repository cloud-archive:mitaka || true
   SHELL
 
   config.vm.provision "ansible" do |ansible|
     ansible.playbook = "ansible/playbook.yml"
     # ansible.inventory_path = "ansible/hosts"
-    ansible.verbose = "v"
     ansible.limit = "all"
   end
 
