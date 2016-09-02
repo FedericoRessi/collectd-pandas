@@ -1,8 +1,0 @@
-CHANGES
-=======
-
-* Run functional tests inside collectd
-* Use tox to run functional tests on ubuntu xenial
-* Provision a Vagrant file to be used for functional testing
-* Create tox.ini and setup.py
-* Initial commit

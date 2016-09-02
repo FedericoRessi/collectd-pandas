@@ -12,17 +12,29 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
+import logging
 
 from unittest2 import TestCase
 
-
 import collectd  # pylint: disable=import-error
+
+
+LOG = logging.getLogger(__name__)
 
 
 class TestPlugin(TestCase):
 
     @staticmethod
-    def test_register_callbacks():
+    def test_dispach_values():
         "test register_callbaks method"
 
-        collectd.info("test something with collectd.")
+        values = collectd.Values()
+        for value in range(10):
+            values.dispatch(type='counter', values=[value])
+
+    @staticmethod
+    def test_flush():
+        "test register_callbaks method"
+
+        LOG.info("%r", dir(collectd))
+        collectd.flush("python")

@@ -11,11 +11,14 @@
 # WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
 # License for the specific language governing permissions and limitations
 # under the License.
-
 "Main plugin entry point."
 
-
 import logging
+
+try:
+    import collectd
+except ImportError:
+    collectd = None
 
 
 LOGGER = logging.getLogger(__name__)
@@ -27,28 +30,35 @@ class Plugin(object):
 
     @classmethod
     def register(cls):
+        assert collectd is not None
+
         # pylint: disable=import-error
-        LOGGER.debug("Register plugin: %r", cls)
+        collectd.info("Register plugin: %{}".format(cls))
 
-        import collectd
-
-        plugin = cls(collectd=collectd)
-        collectd.register_config(plugin.configure)
-        collectd.register_init(plugin.initialize)
-        collectd.register_init(plugin.write)
-        LOGGER.debug("Plugin registered.")
+        instance = cls()
+        collectd.register_config(instance.configure)
+        collectd.register_init(instance.initialize)
+        collectd.register_write(instance.write)
+        collectd.register_flush(instance.flush)
+        collectd.info("Plugin registered.")
+        return instance
 
     def configure(self, config):
         # pylint: disable=import-error,no-self-use
         LOGGER.debug("Configure plugin: %r", config)
 
-    def initialize(self):
-        if self.config:
-            raise RuntimeError("Missing plugin configurarion.")
+    @staticmethod
+    def initialize():
+        LOGGER.debug("Initialize plugin.")
 
-    def write(self, *args):
-        # pylint: disable=unused-argument, no-self-use
-        LOGGER.error("Plugin not initialized.")
+    @staticmethod
+    def write(values):
+        LOGGER.debug("Write: %r", values)
 
-    def __init__(self, collectd):
-        self.collectd = collectd
+    @staticmethod
+    def flush(*args, **kwargs):
+        LOGGER.debug("Flush: %r, %r", args, kwargs)
+
+
+if collectd is not None:
+    PLUGIN = Plugin.register()

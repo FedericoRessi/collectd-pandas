@@ -30,6 +30,9 @@ except ImportError:
     collectd = None
 
 
+from collectd_pandas import plugin
+
+
 def get_module_info(obj):
     script_path = str(obj)
     if os.path.isfile(script_path):
@@ -46,7 +49,13 @@ def get_module_info(obj):
 
 
 CONFIGURATION_TEMPLATE = """
-   <LoadPlugin "python">
+    LoadPlugin "logfile"
+    <Plugin "logfile">
+        LogLevel "info"
+        File STDOUT
+        Timestamp true
+        </Plugin>
+    <LoadPlugin "python">
         Globals true
     </LoadPlugin>
     <Plugin python>
@@ -54,6 +63,15 @@ CONFIGURATION_TEMPLATE = """
         LogTraces true
         Interactive true
         Import "{runner_module_name}"
+    </Plugin>
+    <Plugin python>
+        ModulePath "{plugin_module_path}"
+        LogTraces true
+        Interactive true
+        Import "{plugin_module_name}"
+        <Module "{plugin_module_name}">
+            some "Value"
+        </Module>
     </Plugin>
 """
 
@@ -79,6 +97,7 @@ else:
 class CollectdRunner(object):
 
     runner_module_path, runner_module_name = get_module_info(__file__)
+    plugin_module_path, plugin_module_name = get_module_info(plugin.__file__)
 
     configuration_template = CONFIGURATION_TEMPLATE
 
@@ -87,6 +106,8 @@ class CollectdRunner(object):
 
     def __init__(self, function=None):
         self.configuration = self.configuration_template.format(
+            plugin_module_path=self.plugin_module_path,
+            plugin_module_name=self.plugin_module_name,
             runner_module_path=self.runner_module_path,
             runner_module_name=self.runner_module_name)
         self.function = function
