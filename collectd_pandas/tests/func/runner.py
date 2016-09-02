@@ -49,12 +49,6 @@ def get_module_info(obj):
 
 
 CONFIGURATION_TEMPLATE = """
-    LoadPlugin "logfile"
-    <Plugin "logfile">
-        LogLevel "info"
-        File STDOUT
-        Timestamp true
-        </Plugin>
     <LoadPlugin "python">
         Globals true
     </LoadPlugin>

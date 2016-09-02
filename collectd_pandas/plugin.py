@@ -20,8 +20,11 @@ try:
 except ImportError:
     collectd = None
 
+from collectd_pandas.logger import CollectdLogHandler
 
-LOGGER = logging.getLogger(__name__)
+
+LOG = logging.getLogger(__name__)
+LOG_FORMAT = '%(levelname)-7s | %(name)s | %(message)s'
 
 
 class Plugin(object):
@@ -32,32 +35,35 @@ class Plugin(object):
     def register(cls):
         assert collectd is not None
 
-        # pylint: disable=import-error
-        collectd.info("Register plugin: %{}".format(cls))
+        LOG.info("Register plugin: %s", cls)
+
+        log_handler = CollectdLogHandler(collectd=collectd)
+        log_handler.setFormatter(logging.Formatter(LOG_FORMAT))
+        logging.getLogger('collectd_pandas').addHandler(log_handler)
 
         instance = cls()
         collectd.register_config(instance.configure)
         collectd.register_init(instance.initialize)
         collectd.register_write(instance.write)
         collectd.register_flush(instance.flush)
-        collectd.info("Plugin registered.")
+        LOG.info("Plugin registered.")
         return instance
 
     def configure(self, config):
         # pylint: disable=import-error,no-self-use
-        LOGGER.debug("Configure plugin: %r", config)
+        LOG.debug("Configure plugin: %r", config)
 
     @staticmethod
     def initialize():
-        LOGGER.debug("Initialize plugin.")
+        LOG.debug("Initialize plugin.")
 
     @staticmethod
     def write(values):
-        LOGGER.debug("Write: %r", values)
+        LOG.debug("Write: %r", values)
 
     @staticmethod
     def flush(*args, **kwargs):
-        LOGGER.debug("Flush: %r, %r", args, kwargs)
+        LOG.debug("Flush: %r, %r", args, kwargs)
 
 
 if collectd is not None:
