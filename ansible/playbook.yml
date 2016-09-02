@@ -1,0 +1,15 @@
+- hosts: all
+  remote_user: ubuntu
+  tasks:
+  - name: ensure collectd is installed
+    become: true
+    become_user: root
+    apt:
+      name: collectd
+      state: present
+  - name: ensure collectd is not stopped
+    become: true
+    become_user: root
+    service:
+      name: collectd
+      state: stopped
