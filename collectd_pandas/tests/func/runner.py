@@ -30,9 +30,6 @@ except ImportError:
     collectd = None
 
 
-from collectd_pandas import plugin
-
-
 def get_module_info(obj):
     script_path = str(obj)
     if os.path.isfile(script_path):
@@ -58,15 +55,6 @@ CONFIGURATION_TEMPLATE = """
         Interactive true
         Import "{runner_module_name}"
     </Plugin>
-    <Plugin python>
-        ModulePath "{plugin_module_path}"
-        LogTraces true
-        Interactive true
-        Import "{plugin_module_name}"
-        <Module "{plugin_module_name}">
-            some "Value"
-        </Module>
-    </Plugin>
 """
 
 CODE_TEMPLATE = """
@@ -91,7 +79,6 @@ else:
 class CollectdRunner(object):
 
     runner_module_path, runner_module_name = get_module_info(__file__)
-    plugin_module_path, plugin_module_name = get_module_info(plugin.__file__)
 
     configuration_template = CONFIGURATION_TEMPLATE
 
@@ -100,8 +87,6 @@ class CollectdRunner(object):
 
     def __init__(self, function=None):
         self.configuration = self.configuration_template.format(
-            plugin_module_path=self.plugin_module_path,
-            plugin_module_name=self.plugin_module_name,
             runner_module_path=self.runner_module_path,
             runner_module_name=self.runner_module_name)
         self.function = function
@@ -124,9 +109,7 @@ class CollectdRunner(object):
                     ["collectd", '-f', '-P', pid_path,
                      "-C", configuration_path],
                     stdin=subprocess.PIPE,
-                    # stdout=subprocess.PIPE,
-                    stderr=subprocess.PIPE
-                )
+                    stderr=subprocess.PIPE)
                 process.communicate(input=code)
                 return process.wait()
 
@@ -164,16 +147,7 @@ def create_temp_file(text=None):
         os.remove(file_path)
 
 
-COLLECTD_LOGGER = logging.getLogger('collectd')
-COLLECTD_LEVELS = {}
-
-
-def collectd_log(severity, message):
-    COLLECTD_LOGGER.log(COLLECTD_LEVELS[severity], message)
-
-
 class Stream(object):
-    # pylint: disable=too-few-public-methods
 
     @staticmethod
     def write(message):
@@ -181,13 +155,7 @@ class Stream(object):
 
 
 if collectd:
-    COLLECTD_LEVELS = {
-        collectd.LOG_DEBUG: logging.DEBUG,
-        collectd.LOG_INFO: logging.INFO,
-        collectd.LOG_NOTICE: logging.INFO,
-        collectd.LOG_WARNING: logging.WARNING,
-        collectd.LOG_ERROR: logging.ERROR}
     LOGGER_FORMAT = '%(asctime)-15s | %(levelname)-7s | %(name)s | %(message)s'
     logging.basicConfig(
         format=LOGGER_FORMAT, stream=Stream(), level=logging.NOTSET)
-    collectd.register_log(collectd_log)
+    __import__("collectd_pandas.plugin")

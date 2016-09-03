@@ -18,23 +18,27 @@ from unittest2 import TestCase
 
 import collectd  # pylint: disable=import-error
 
-
-LOG = logging.getLogger(__name__)
+from collectd_pandas.tests.match import attributes
+from collectd_pandas.tests.mocking import patch_logger
 
 
 class TestPlugin(TestCase):
 
     @staticmethod
-    def test_dispach_values():
+    @patch_logger('collectd_pandas.plugin.LOG')
+    def test_dispach_values(logger):
         "test register_callbaks method"
 
-        values = collectd.Values()
-        for value in range(10):
-            values.dispatch(type='counter', values=[value])
+        expected = attributes(
+            type='counter',
+            plugin='my_plugin',
+            host='my_host',
+            time=1472890813.3816543,
+            interval=10.0,
+            values=[10])
 
-    @staticmethod
-    def test_flush():
-        "test register_callbaks method"
+        values = collectd.Values(**expected.as_dict())
+        values.dispatch()
 
-        LOG.info("%r", dir(collectd))
-        collectd.flush("python")
+        logger.assert_has_record(
+            "Write: %r", args=(expected,), level=logging.DEBUG)

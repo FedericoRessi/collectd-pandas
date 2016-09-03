@@ -45,8 +45,7 @@ class Plugin(object):
         collectd.register_config(instance.configure)
         collectd.register_init(instance.initialize)
         collectd.register_write(instance.write)
-        collectd.register_flush(instance.flush)
-        LOG.info("Plugin registered.")
+        LOG.info("Plugin registered as: %r.", instance)
         return instance
 
     def configure(self, config):
@@ -60,10 +59,6 @@ class Plugin(object):
     @staticmethod
     def write(values):
         LOG.debug("Write: %r", values)
-
-    @staticmethod
-    def flush(*args, **kwargs):
-        LOG.debug("Flush: %r, %r", args, kwargs)
 
 
 if collectd is not None:

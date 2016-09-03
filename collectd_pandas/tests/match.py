@@ -18,6 +18,7 @@ import fnmatch
 from json import loads
 import re
 
+import six
 
 __unittest = True  # pylint: disable=invalid-name
 
@@ -53,3 +54,31 @@ class MatchWildcard(object):
 
     def __repr__(self):
         return "MatchWildcard({})".format(self._text)
+
+
+def attributes(**attribs):
+    return MatchAttributes(**attribs)
+
+
+class MatchAttributes(object):
+
+    def __init__(self, **attribs):
+        self._attribs = sorted(six.iteritems(attribs))
+
+    def __eq__(self, obj):
+        for name, expected in self._attribs:
+            if expected != getattr(obj, name):
+                return False
+        return True
+
+    def __repr__(self):
+        attribs = ", ".join("{}={}".format(name, repr(expected))
+                            for name, expected in self._attribs)
+        return "MatchAttributes({})".format(attribs)
+
+    def from_other(self, obj):
+        return MatchAttributes(
+            **{name: getattr(obj, name) for name, _ in self._attribs})
+
+    def as_dict(self):
+        return dict(self._attribs)

@@ -34,7 +34,7 @@ def main(argv):
             module=None,
             argv=argv,
             testRunner=unittest2.TextTestRunner(
-                stream=sys.stdout, verbosity=2, buffer=True,
+                stream=sys.stdout, verbosity=2, buffer=False,
                 descriptions=False, resultclass=LogTestResult))
 
     except SystemExit as ex:
