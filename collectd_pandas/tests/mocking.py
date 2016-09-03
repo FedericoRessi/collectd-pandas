@@ -28,8 +28,11 @@ mock.__unittest = True  # pylint: disable=protected-access
 
 def patch_logger(target, level=logging.NOTSET, timeout=5.):
     name, _ = target.rsplit('.', 1)
-    logger = MockLogger(name, level=level, timeout=timeout)
-    return patch(target, new_callable=lambda: logger)
+
+    def new_logger():
+        return MockLogger(name, level=level, timeout=timeout)
+
+    return patch(target, new_callable=new_logger)
 
 
 class MockLogger(logging.Logger):
